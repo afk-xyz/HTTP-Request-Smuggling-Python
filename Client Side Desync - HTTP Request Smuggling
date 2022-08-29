@@ -1,5 +1,6 @@
 #Client Side Desync (HTTP Request Smuggling) by AFK
 #Shoutz @albinowax @portswigger @orange_8361
+#Lab : https://portswigger.net/web-security/request-smuggling/browser/client-side-desync/lab-client-side-desync
 
 import http.client
 import pprint
